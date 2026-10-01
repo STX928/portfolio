@@ -1,0 +1,436 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(0.11 0.01 260);
+  --foreground: oklch(0.97 0.005 260);
+  --card: oklch(0.16 0.012 260);
+  --card-foreground: oklch(0.97 0.005 260);
+  --popover: oklch(0.16 0.012 260);
+  --popover-foreground: oklch(0.97 0.005 260);
+  --primary: oklch(0.97 0.005 260);
+  --primary-foreground: oklch(0.11 0.01 260);
+  --secondary: oklch(0.2 0.014 260);
+  --secondary-foreground: oklch(0.97 0.005 260);
+  --muted: oklch(0.2 0.014 260);
+  --muted-foreground: oklch(0.68 0.02 260);
+  --accent: oklch(0.84 0.14 195);
+  --accent-foreground: oklch(0.11 0.01 260);
+  --destructive: oklch(0.63 0.22 25);
+  --destructive-foreground: oklch(0.97 0.005 260);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.84 0.14 195);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-foreground);
+  }
+}
+
+/* ---- Scroll reveal transitions ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(36px) scale(0.98);
+  filter: blur(6px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
+
+/* ---- Hero name stroke animation ---- */
+@keyframes stroke-draw {
+  0% {
+    stroke-dashoffset: 600;
+    fill: transparent;
+  }
+  60% {
+    fill: transparent;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    fill: currentColor;
+  }
+}
+
+.hero-name {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: stroke-draw 4.5s ease forwards 0.3s;
+}
+
+@keyframes hero-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.hero-after-name {
+  opacity: 0;
+  animation: hero-content-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards 4.8s;
+}
+
+/* ---- Profile photo hover effect ---- */
+.profile-frame {
+  position: relative;
+  border-radius: 1.25rem;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+}
+
+.profile-frame::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 1.4rem;
+  background: conic-gradient(
+    from var(--spin, 0deg),
+    transparent 0%,
+    var(--accent) 12%,
+    transparent 28%,
+    transparent 55%,
+    var(--foreground) 70%,
+    transparent 85%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: -1;
+}
+
+@property --spin {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.profile-frame:hover::before {
+  opacity: 1;
+  animation: border-spin 3.2s linear infinite;
+}
+
+@keyframes border-spin {
+  to {
+    --spin: 360deg;
+  }
+}
+
+.profile-frame img {
+  filter: grayscale(0.9) contrast(1.05);
+  transform: scale(1.001);
+  transition:
+    filter 0.6s ease,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.profile-frame:hover img {
+  filter: grayscale(0) contrast(1);
+  transform: scale(1.06);
+}
+
+.profile-frame .profile-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    oklch(1 0 0 / 18%) 48%,
+    transparent 62%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.profile-frame:hover .profile-shine {
+  transform: translateX(120%);
+}
+
+.profile-frame .profile-caption {
+  transform: translateY(12px);
+  opacity: 0;
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.profile-frame:hover .profile-caption {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* ---- Animated aurora background ---- */
+@keyframes aurora-shift {
+  0% {
+    background-position:
+      0% 50%,
+      100% 50%,
+      50% 0%;
+  }
+  50% {
+    background-position:
+      100% 50%,
+      0% 50%,
+      50% 100%;
+  }
+  100% {
+    background-position:
+      0% 50%,
+      100% 50%,
+      50% 0%;
+  }
+}
+
+.aurora {
+  position: absolute;
+  inset: -20%;
+  background-image:
+    radial-gradient(
+      40% 40% at 20% 30%,
+      oklch(0.84 0.14 195 / 22%) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 45% at 80% 20%,
+      oklch(0.65 0.18 280 / 18%) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 50% at 50% 90%,
+      oklch(0.8 0.16 160 / 16%) 0%,
+      transparent 70%
+    );
+  background-size: 180% 180%;
+  filter: blur(54px);
+  opacity: 0.7;
+  animation: aurora-shift 26s ease-in-out infinite;
+}
+
+/* ---- Slowly crossing network lines ---- */
+@keyframes network-travel {
+  0% {
+    transform: translate3d(-8%, -5%, 0) rotate(-8deg);
+  }
+  50% {
+    transform: translate3d(4%, 5%, 0) rotate(-5deg);
+  }
+  100% {
+    transform: translate3d(-8%, -5%, 0) rotate(-8deg);
+  }
+}
+
+.network-lines {
+  position: absolute;
+  inset: -30%;
+  opacity: 0.32;
+  background-image:
+    linear-gradient(112deg, transparent 0 43%, oklch(0.84 0.14 195 / 18%) 43.15%, transparent 43.35%),
+    linear-gradient(68deg, transparent 0 57%, oklch(0.84 0.14 195 / 11%) 57.15%, transparent 57.35%),
+    linear-gradient(148deg, transparent 0 66%, oklch(0.97 0.005 260 / 8%) 66.1%, transparent 66.3%);
+  will-change: transform;
+  animation: network-travel 24s ease-in-out infinite;
+}
+
+.network-lines-secondary {
+  opacity: 0.2;
+  transform: scaleX(-1);
+  animation-duration: 34s;
+  animation-delay: -13s;
+}
+
+/* ---- Drifting grid ---- */
+@keyframes grid-pan {
+  to {
+    background-position:
+      72px 72px,
+      72px 72px;
+  }
+}
+
+.grid-drift {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, oklch(1 0 0 / 4%) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(1 0 0 / 4%) 1px, transparent 1px);
+  background-size:
+    72px 72px,
+    72px 72px;
+  mask-image: radial-gradient(70% 60% at 50% 40%, black, transparent 100%);
+  animation: grid-pan 14s linear infinite;
+}
+
+/* ---- Sweeping light beam ---- */
+@keyframes beam-sweep {
+  0% {
+    transform: translateX(-60%) rotate(12deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(160%) rotate(12deg);
+    opacity: 0;
+  }
+}
+
+.beam {
+  position: absolute;
+  top: -30%;
+  left: 0;
+  height: 160%;
+  width: 28%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    oklch(0.84 0.14 195 / 10%),
+    transparent
+  );
+  filter: blur(18px);
+  animation: beam-sweep 16s ease-in-out infinite;
+}
+
+/* ---- Twinkling particles ---- */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(-18px) scale(1.4);
+  }
+}
+
+.spark {
+  position: absolute;
+  height: 3px;
+  width: 3px;
+  border-radius: 9999px;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+  animation: twinkle 7s ease-in-out infinite;
+}
+
+.project-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid oklch(1 0 0 / 6%);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .aurora {
+    filter: blur(36px);
+    opacity: 0.55;
+  }
+
+  .beam:nth-of-type(5),
+  .spark:nth-of-type(even) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-name,
+  .hero-after-name {
+    animation: none;
+  }
+
+  .hero-name {
+    stroke-dashoffset: 0;
+    fill: currentColor;
+  }
+
+  .hero-after-name {
+    opacity: 1;
+  }
+
+  .aurora,
+  .grid-drift,
+  .beam,
+  .spark,
+  .network-lines {
+    animation: none;
+  }
+
+  .network-lines {
+    transform: none;
+  }
+}
