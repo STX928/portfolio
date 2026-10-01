@@ -26,7 +26,7 @@ import {
   Send,
 } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import profileAsset from "../assets/sajad-nazar-profile.jpg.asset.json";
+import profileImage from "../assets/sajad.png";
 import { useQuery } from "@tanstack/react-query";
 import { portfolioQuery, resolveImage, type Project } from "@/lib/portfolio";
 import { skillIcon } from "@/lib/skill-icons";
@@ -138,7 +138,7 @@ function ProfilePhoto() {
     >
       <div className="relative overflow-hidden rounded-[1.25rem] bg-secondary">
         <img
-          src={profileAsset.url}
+          src={profileImage}
           alt="Portrait of Sajad Nazar"
           loading="lazy"
           width={640}
