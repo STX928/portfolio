@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const TO_EMAIL = "sajadnazar928@gmail.com";
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_mail/gmail/v1";
 
 const schema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -12,23 +11,13 @@ const schema = z.object({
   message: z.string().trim().min(1).max(5000),
 });
 
-const b64 = (s: string) =>
-  btoa(
-    Array.from(new TextEncoder().encode(s), (b) => String.fromCharCode(b)).join(
-      "",
-    ),
-  );
-
-const header = (v: string) =>
-  /^[\x00-\x7F]*$/.test(v) ? v : `=?UTF-8?B?${b64(v)}?=`;
-
 export const sendContactMessage = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
-    const lovableKey = process.env["LOVABLE_API_KEY"];
-    const connectionKey = process.env["GOOGLE_MAIL_API_KEY"];
-    if (!lovableKey || !connectionKey) {
-      throw new Error("Email sending is not configured yet.");
+    const apiKey = process.env["RESEND_API_KEY"];
+
+    if (!apiKey) {
+      throw new Error("Email sending is not configured.");
     }
 
     const subject = data.subject
@@ -46,34 +35,24 @@ export const sendContactMessage = createServerFn({ method: "POST" })
       .filter(Boolean)
       .join("\n");
 
-    const raw = b64(
-      [
-        `To: ${TO_EMAIL}`,
-        `Reply-To: ${data.email}`,
-        `Subject: ${header(subject)}`,
-        "MIME-Version: 1.0",
-        'Content-Type: text/plain; charset="UTF-8"',
-        "",
-        body,
-      ].join("\r\n"),
-    )
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
-
-    const res = await fetch(`${GATEWAY_URL}/users/me/messages/send`, {
+    const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": connectionKey,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ raw }),
+      body: JSON.stringify({
+        from: "Portfolio <onboarding@resend.dev>",
+        to: [TO_EMAIL],
+        reply_to: data.email,
+        subject,
+        text: body,
+      }),
     });
 
     if (!res.ok) {
       const errorBody = await res.text();
-      console.error(`Gmail send failed [${res.status}]: ${errorBody}`);
+      console.error(`Resend failed [${res.status}]: ${errorBody}`);
       throw new Error(`Could not send the message [${res.status}]`);
     }
 
