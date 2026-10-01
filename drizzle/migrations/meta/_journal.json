@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790377049644,
+      "tag": "0000_portfolio_admin",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790456344158,
+      "tag": "0001_skills_and_section_order",
+      "breakpoints": true
+    }
+  ]
+}
